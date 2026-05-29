@@ -1,0 +1,42 @@
+{
+  "config": {
+    "max_depth": 6,
+    "learning_rate": 0.1,
+    "num_rounds": 100,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 1,
+    "gamma": 0,
+    "objective": "binary:logistic"
+  },
+  "metrics": {
+    "training_accuracy": 0.942,
+    "validation_accuracy": 0.938,
+    "precision": 0.943,
+    "recall": 0.89,
+    "f1_score": 0.916,
+    "auc": 0.96
+  },
+  "features": [
+    "SourceLOC",
+    "TargetLOC",
+    "SourceCyclomatic",
+    "TargetCyclomatic",
+    "SourceCommits",
+    "TargetCommits",
+    "SourceChangeRate",
+    "TargetChangeRate",
+    "SourceInDegree",
+    "SourceOutDegree",
+    "TargetInDegree",
+    "TargetOutDegree",
+    "SourceTeams",
+    "TargetTeams",
+    "SharedTeams",
+    "SourceLayer",
+    "TargetLayer"
+  ],
+  "version": "0.1",
+  "trained_at": "mock",
+  "model_path": ".avidrec_models/avidrec_model.json"
+}

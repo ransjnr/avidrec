@@ -12,20 +12,23 @@ func main() {
 	// Command-line flags
 	projectPath := flag.String("path", ".", "Path to the Go project to analyze")
 	verbose := flag.Bool("verbose", false, "Enable verbose output")
-	phase := flag.String("phase", "all", "Phase to run: all, detection, prediction")
+	phase := flag.String("phase", "all", "Phase to run: all, detection, prediction, synthesis")
 	modelDir := flag.String("model-dir", ".avidrec_models", "Directory for trained models")
+	outputLang := flag.String("lang", "go", "Language for code generation: go, java, python, javascript")
 	flag.Parse()
 
 	fmt.Println("╔══════════════════════════════════════════════════════════════╗")
-	fmt.Println("║                        AViDRec v0.2                          ║")
+	fmt.Println("║                        AViDRec v0.3                          ║")
 	fmt.Println("║   Architectural Violation Detection and Recovery System      ║")
-	fmt.Println("║         Phase 1: CycleFinder + Phase 2: ML Predictor         ║")
+	fmt.Println("║  Phase 1: CycleFinder + Phase 2: ML Predictor + Phase 3      ║")
+	fmt.Println("║               Automated Synthesis (Z3 + CodeGen)             ║")
 	fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 	fmt.Println()
 
 	// Measure execution time
 	startTime := time.Now()
 	var cycles []Cycle
+	var predictions []*PredictionResult
 
 	// Step 1: Parse the Go project
 	fmt.Printf("📂 Analyzing project at: %s\n", *projectPath)
@@ -61,7 +64,7 @@ func main() {
 	}
 
 	// PHASE 2: Prediction
-	if *phase == "all" || *phase == "prediction" {
+	if *phase == "all" || *phase == "prediction" || *phase == "synthesis" {
 		fmt.Println("═══════════════════════════════════════════════════════════════")
 		fmt.Println("PHASE 2: ML Violation Predictor (XGBoost)")
 		fmt.Println("═══════════════════════════════════════════════════════════════")
@@ -93,8 +96,8 @@ func main() {
 
 		// Step 6: Make predictions on all dependencies
 		if model != nil {
-			predictor := NewViolationPredictor(model, graph, 0.5) // 0.5 threshold = 50%
-			predictions := predictor.PredictAllDependencies(graph)
+			predictor := NewViolationPredictor(model, graph, 0.5)
+			predictions = predictor.PredictAllDependencies(graph)
 			
 			// Print predictions
 			predictor.PrintPredictions(predictions)
@@ -105,7 +108,54 @@ func main() {
 		}
 	}
 
-	// Step 7: Print summary
+	// PHASE 3: Synthesis
+	if *phase == "all" || *phase == "synthesis" {
+		fmt.Println("═══════════════════════════════════════════════════════════════")
+		fmt.Println("PHASE 3: Automated Refactoring Synthesis (Z3 + CodeGen)")
+		fmt.Println("═══════════════════════════════════════════════════════════════")
+
+		if len(predictions) == 0 {
+			// Run prediction first if not done
+			if cycles == nil {
+				cycleFinder := NewCycleFinder(graph)
+				cycles = cycleFinder.FindAllCycles()
+			}
+
+			os.MkdirAll(*modelDir, 0755)
+			datasetPath := filepath.Join(*modelDir, "training_data.csv")
+			
+			generator := NewDatasetGenerator(graph, cycles)
+			generator.GenerateSyntheticDataset(datasetPath)
+
+			trainer := NewXGBoostTrainer(datasetPath, *modelDir)
+			model, _ := trainer.TrainModel()
+
+			if model != nil {
+				predictor := NewViolationPredictor(model, graph, 0.5)
+				predictions = predictor.PredictAllDependencies(graph)
+			}
+		}
+
+		if len(predictions) > 0 {
+			// Step 7: Synthesize refactoring solutions
+			synthesizer := NewRefactoringSynthesizer(predictions, graph)
+			solutions := synthesizer.SynthesizeAllSolutions()
+
+			// Step 8: Print solutions
+			synthesizer.PrintSolutions()
+
+			// Step 9: Print detailed solutions for each high-risk violation
+			for i, solution := range solutions {
+				if i >= 3 { // Limit to first 3 detailed outputs
+					fmt.Printf("\n... and %d more solutions\n\n", len(solutions)-3)
+					break
+				}
+				PrintDetailedSolution(solution, *outputLang)
+			}
+		}
+	}
+
+	// Step 10: Print summary
 	elapsed := time.Since(startTime)
 	printSummary(graph, cycles, elapsed)
 }

@@ -1,0 +1,30 @@
+{
+  "features": [
+    "SourceLOC",
+    "TargetLOC",
+    "SourceCyclomatic",
+    "TargetCyclomatic",
+    "SourceCommits",
+    "TargetCommits",
+    "SourceChangeRate",
+    "TargetChangeRate",
+    "SourceInDegree",
+    "SourceOutDegree",
+    "TargetInDegree",
+    "TargetOutDegree",
+    "SourceTeams",
+    "TargetTeams",
+    "SharedTeams",
+    "SourceLayer",
+    "TargetLayer"
+  ],
+  "metrics": {
+    "training_accuracy": 0.994413407821229,
+    "validation_accuracy": 0.9777777777777777,
+    "precision": 0.96,
+    "recall": 1.0,
+    "f1_score": 0.9795918367346939,
+    "auc": 1.0
+  },
+  "model_file": ".avidrec_models/avidrec_model.json.model"
+}
